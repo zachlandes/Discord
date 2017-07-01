@@ -4,9 +4,8 @@ import asyncio
 token = ''
 
 with open('keys') as keys:
-    for  i in keys:
+    for i in keys:
         token = i
-
 
 client = discord.Client()
 
@@ -31,4 +30,5 @@ async def on_message(message):
         await asyncio.sleep(5)
         await client.send_message(message.channel, 'Done sleeping')
 
+print(token)
 client.run(token)
