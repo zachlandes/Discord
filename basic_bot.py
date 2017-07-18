@@ -4,6 +4,19 @@ from discord.ext import commands
 
 bot  = commands.Bot('!')
 
+
+
+with open('keys', 'r') as f:
+    keys = f.read().splitlines()
+
+"""
+clip_dict = {}
+with open('clips', 'r') as f:
+    for line in f:
+        split_line = line.strip('\n').split('|')
+        clip_dict[split_line[len(split_line)-1]] = split_line[:-1]
+"""
+
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -70,4 +83,4 @@ async def play(ctx, filename):
     player.start()
 
 
-bot.run('MzI5NzY3ODQ1NzY2NjI3MzI4.DD7LKQ.7FoZd6R8CAOZdy8KKTMyS3EQB6g')
+bot.run(keys[0])
