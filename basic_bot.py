@@ -9,14 +9,15 @@ bot  = commands.Bot('!')
 with open('keys', 'r') as f:
     keys = f.read().splitlines()
 
-"""
+#import clips dictionary with {key:value} = {filename:[tags]}
+#note that tags in clips file must be lowercase
 clip_dict = {}
 with open('clips', 'r') as f:
     for line in f:
         split_line = line.strip('\n').split('|')
         clip_dict[split_line[len(split_line)-1]] = split_line[:-1]
-"""
 
+print(clip_dict)
 @bot.event
 async def on_ready():
     print('Logged in as')
@@ -81,6 +82,23 @@ async def play(ctx, filename):
     #await bot.say(":musical_note: | Playing `" + player.title)
 
     player.start()
+
+#testing a function that will read user submitted tags
+@bot.command(pass_context = True)
+async def keyword(ctx, *tags):
+    #TO DO: include code to handle case where no arg is passed
+    file_tags = " ".join(tags).lower().split('|')
+    print(file_tags)
+    for filename, tag_values in clip_dict.items():
+        for value in tag_values:
+            for tag in file_tags:
+                if tag == value:
+                    print(filename)
+                    vc = ctx.message.author.voice_channel
+                    voice_client = await bot.join_voice_channel(vc)
+                    player = voice_client.create_ffmpeg_player(filename, after=lambda:close_player(filename))
+
+                    player.start()
 
 
 bot.run(keys[0])
