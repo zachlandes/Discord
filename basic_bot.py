@@ -1,6 +1,7 @@
 import discord
 import asyncio
 from discord.ext import commands
+from collections import defaultdict
 
 bot  = commands.Bot('!')
 
@@ -87,18 +88,25 @@ async def play(ctx, filename):
 @bot.command(pass_context = True)
 async def keyword(ctx, *tags):
     #TO DO: include code to handle case where no arg is passed
-    file_tags = " ".join(tags).lower().split('|')
-    print(file_tags)
+    user_tags = " ".join(tags).lower().split('|')
+    
+    print(user_tags)
+    
+    matches = defaultdict(lambda: 0)
+    
     for filename, tag_values in clip_dict.items():
         for value in tag_values:
-            for tag in file_tags:
+            for tag in user_tags:
                 if tag == value:
                     print(filename)
+                    matches[filename] +=1
+                    print(matches[filename]) 
+                    #TO DO: check if already connected to a voice channel on this server
                     vc = ctx.message.author.voice_channel
                     voice_client = await bot.join_voice_channel(vc)
                     player = voice_client.create_ffmpeg_player(filename, after=lambda:close_player(filename))
 
                     player.start()
-
+                    #TO DO: make bot leave voice channel unless another audio file is queued
 
 bot.run(keys[0])
