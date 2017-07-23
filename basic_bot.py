@@ -2,7 +2,9 @@ import discord
 import asyncio
 from discord.ext import commands
 from collections import defaultdict
+import random
 
+#TO DO: add function allowing command prefix to be set by user
 bot  = commands.Bot('!')
 
 
@@ -12,8 +14,9 @@ with open('keys', 'r') as f:
 
 #import clips dictionary with {key:value} = {filename:[tags]}
 #note that tags in clips file must be lowercase
+file_path = 'audio_clips/'
 clip_dict = {}
-with open('clips', 'r') as f:
+with open(file_path + 'clips', 'r') as f:
     for line in f:
         split_line = line.strip('\n').split('|')
         clip_dict[split_line[len(split_line)-1]] = split_line[:-1]
@@ -79,7 +82,7 @@ return await client.say(embed = embed)
 async def play(ctx, filename):
     vc = ctx.message.author.voice_channel
     voice_client = await bot.join_voice_channel(vc)
-    player = voice_client.create_ffmpeg_player(filename, after=lambda:close_player(filename))    
+    player = voice_client.create_ffmpeg_player(file_path + str(filename), after=lambda:close_player(file_path))    
     #await bot.say(":musical_note: | Playing `" + player.title)
 
     player.start()
@@ -92,21 +95,52 @@ async def keyword(ctx, *tags):
     
     print(user_tags)
     
+    #create a dict of {filename:count of tag matches} for all files with at least 1 tag match
     matches = defaultdict(lambda: 0)
-    
     for filename, tag_values in clip_dict.items():
         for value in tag_values:
             for tag in user_tags:
                 if tag == value:
-                    print(filename)
+                    #print(filename)
                     matches[filename] +=1
-                    print(matches[filename]) 
-                    #TO DO: check if already connected to a voice channel on this server
-                    vc = ctx.message.author.voice_channel
-                    voice_client = await bot.join_voice_channel(vc)
-                    player = voice_client.create_ffmpeg_player(filename, after=lambda:close_player(filename))
+                    #print(matches[filename]) 
+                
+    print(matches)
 
-                    player.start()
-                    #TO DO: make bot leave voice channel unless another audio file is queued
+    #check if user in a voice channel, if so, check if bot is in the same channel
+    vc = ctx.message.author.voice_channel
+    if not vc:                              #if user is not in a voice channel tell them
+        no_voice_msg = discord.Embed(description =  "Hey! You're not in a voice channel!", color = 0xff0000) #color must be hex, or discord.Color.?
+        return await bot.say(embed=no_voice_msg)
+    else:                                   #if user *is* in a voice channel
+        for c in bot.voice_clients:
+            if(c.server == ctx.message.server and c.channel == vc):   #if bot is in same voice channel as user break out of loop
+                print(1)
+                voice_client = c
+                break
+            elif(c.server == ctx.message.server):                     #if bot is in a different voice channel leave that channel and join author's
+                print(2)
+                await c.disconnect()
+                voice_client = await bot.join_voice_channel(vc)
+                break
+        else:
+            print(3)                                                         #if bot is not in a voice channel join the users voice channel
+            voice_client = await bot.join_voice_channel(vc)
+            
+   
+    #voice_client = await bot.join_voice_channel(vc)
+    if not matches:
+        no_match_msg = discord.Embed(description =  "Damn - no matches! Try different tags?", color = 0xff0000) #color must be hex, or discord.Color.?
+        return await bot.say(embed=no_match_msg)
+    else:
+        max_val = max(matches.values())
+        #print('max values: ' + str(max_val))
+        max_files = [f for f, t in matches.items() if t == max_val]
+        #print('max files: ' + str(max_files))
+        file_choice = random.choice(max_files)
+        player = voice_client.create_ffmpeg_player(file_path+file_choice, after=lambda:close_player(file_path+file_choice))
+
+        player.start()
+                    
 
 bot.run(keys[0])
