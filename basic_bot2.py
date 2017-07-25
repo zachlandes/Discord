@@ -114,6 +114,8 @@ async def smak(ctx, *tags):
         if (player.is_playing() == False):
             playingsong = False
             print(2)
+        else:
+            pass
         if (playingsong == True):
             await bot.say("Added to queue")
             queue.append(file_path+file_choice)
@@ -122,27 +124,15 @@ async def smak(ctx, *tags):
             vc_clients[message.server.id].append(player)
             player.start()
             playingsong = True
-            """
-            embed = discord.Embed(title = "Now playing :musical_note:", description = str(player.title), color = 0x0000FF)
-            embed.add_field(name = "Duration (in seconds)", value = str(player.duration))
-            embed.add_field(name = "Requested by", value = str(message.author))
-            await bot.delete_message(mg)
-            await bot.say(embed = embed)"""
-            while True:
+            x = 1 
+            While True:
                 if (playingsong == True):
                     continue
                 else:
-                    x = 1
                     player = vc_clients[ctx.message.server.id][0].create_ffmpeg_player(queue[x])
                     vc_clients[message.server.id].append(player)
                     player.start()
                     playingsong = True
-                    """
-                    embed = discord.Embed(title = "Now playing :musical_note:", description = str(player.title), color = 0x0000FF)
-                    embed.add_field(name = "Duration (in seconds)", value = str(player.duration))
-                    embed.add_field(name = "Requested by", value = str(message.author))
-                    await bot.delete_message(mg)
-                    await bot.say(embed = embed)"""
                     player.close_player(queue[x])
                     print(2312312)
                     x = x+1

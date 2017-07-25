@@ -3,14 +3,11 @@ import asyncio
 from discord.ext import commands
 from collections import defaultdict
 import random
+import keys
 
 #TO DO: add function allowing command prefix to be set by user
 bot  = commands.Bot('!')
 
-
-
-with open('keys', 'r') as f:
-    keys = f.read().splitlines()
 
 #import clips dictionary with {key:value} = {filename:[tags]}
 #note that tags in clips file must be lowercase
@@ -143,4 +140,4 @@ async def keyword(ctx, *tags):
         player.start()
                     
 
-bot.run(keys[0])
+bot.run(keys.BOT_TOKEN)

@@ -1,6 +1,6 @@
 # Specific files #
 ##################
-keys
+keys.py
 *.mp3
 
 # Compiled source #
