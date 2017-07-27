@@ -135,9 +135,19 @@ async def keyword(ctx, *tags):
         max_files = [f for f, t in matches.items() if t == max_val]
         #print('max files: ' + str(max_files))
         file_choice = random.choice(max_files)
-        player = voice_client.create_ffmpeg_player(file_path+file_choice, after=lambda:close_player(file_path+file_choice))
+        
+        stop_event = asyncio.Event()
+        
+        def after():
+            def clear():
+                stop_event.set()
+            bot.loop.call_soon_threadsafe(clear)
+
+        player = voice_client.create_ffmpeg_player(file_path+file_choice, after=after)
 
         player.start()
+
+        await stop_event.wait()
                     
 
 bot.run(keys.BOT_TOKEN)
