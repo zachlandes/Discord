@@ -139,9 +139,8 @@ async def smak(ctx, *tags):
                     vc_clients[message.server.id].append(player)
                     player.start()
                     playingsong = True
-                    x = x+1
-                    print(8)
                     await stop_event.wait()
+                    x = x+1
                     print(9)
  
     except Exception as e:
