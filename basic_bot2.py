@@ -111,11 +111,21 @@ async def smak(ctx, *tags):
         stop_event = asyncio.Event()
         
         def after():
+            coro = stop_event.set()
+            fut = asyncio.run_coroutine_threadsafe(coro, bot.loop)
+            try:
+                playingsong = False
+                print(str(playingsong) + 'fut')
+                fut.result()
+            except:
+                pass
+        """def after():
             def clear():
                 stop_event.set()
             bot.loop.call_soon_threadsafe(clear)
-
-        player = vc_clients[ctx.message.server.id][0].create_ffmpeg_player(file_path+file_choice)
+            playingsong = False
+            """
+        player = vc_clients[ctx.message.server.id][0].create_ffmpeg_player(file_path+file_choice, after=after)
         if (player.is_playing() == False):
             playingsong = False
         else:
@@ -127,22 +137,21 @@ async def smak(ctx, *tags):
         else:
             vc_clients[message.server.id].append(player)
             player.start()
-            playingsong = True
+            await stop_event.wait()
             print(7)
             while True:
                 if (playingsong == True):
                     continue
                 else:
-                    print(7)
+                    print(8)
                     x = 1 
                     player = vc_clients[ctx.message.server.id][0].create_ffmpeg_player(queue[x], after=after)
                     vc_clients[message.server.id].append(player)
                     player.start()
-                    playingsong = True
-                    x = x+1
-                    print(8)
+                    #playingsong = True
                     await stop_event.wait()
-                    print(9)
+                    x = x+1
+
  
     except Exception as e:
         return await bot.say("ERROR: `%s"%e)
