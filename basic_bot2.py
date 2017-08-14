@@ -148,10 +148,17 @@ async def smak(ctx, *tags):
                     player = vc_clients[ctx.message.server.id][0].create_ffmpeg_player(queue[x], after=after)
                     vc_clients[message.server.id].append(player)
                     player.start()
+<<<<<<< HEAD
                     #playingsong = True
                     await stop_event.wait()
                     x = x+1
 
+=======
+                    playingsong = True
+                    await stop_event.wait()
+                    x = x+1
+                    print(9)
+>>>>>>> e42e197f2a104c9aea64181485b71b9f3bc5cffd
  
     except Exception as e:
         return await bot.say("ERROR: `%s"%e)
